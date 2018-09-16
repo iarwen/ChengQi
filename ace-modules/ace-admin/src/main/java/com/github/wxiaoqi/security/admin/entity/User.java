@@ -1,7 +1,9 @@
 package com.github.wxiaoqi.security.admin.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
-import javax.persistence.*;
 
 @Table(name = "base_user")
 public class User {
@@ -71,6 +73,16 @@ public class User {
     private String attr7;
 
     private String attr8;
+
+    private  String avatar;
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
     /**
      * @return id
