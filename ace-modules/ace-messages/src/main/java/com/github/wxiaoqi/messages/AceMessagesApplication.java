@@ -1,6 +1,5 @@
 package com.github.wxiaoqi.messages;
 
-import com.github.wxiaoqi.security.auth.client.EnableAceAuthClient;
 import com.spring4all.swagger.EnableSwagger2Doc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
