@@ -11,13 +11,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import redis.clients.jedis.Jedis;
 
+import java.util.Map;
+
 /**
  *  梁健
  *  2018/9/17 15:49
  *  消息推送Controller
  */
 @Controller
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 public class MessageControler {
 
     @Autowired
@@ -29,10 +31,28 @@ public class MessageControler {
      * 2018/09/17 15:45
      * @param messages
      */
-    @RequestMapping(value = "push",method = RequestMethod.POST)
+    @RequestMapping(value = "/push",method = RequestMethod.POST)
     @ResponseBody
     public ResultUtil releaseTheMessage(@RequestBody Messages messages){
         return messageService.releaseTheMessage(messages);
     };
+
+    /**
+     *
+     * 功能描述: 
+     *
+     * @param:
+     * @return: 
+     * @auther: 1
+     * @date: 2018/9/18 13:00
+     * @description:
+     * @return: 
+     */
+    @RequestMapping(value = "/push/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    @ResponseBody
+    public  ResultUtil agencyToHaveDone(Map hashMap){
+        return messageService.agencyToHaveDone(hashMap);
+    };
+
 
 }
