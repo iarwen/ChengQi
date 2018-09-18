@@ -10,17 +10,17 @@ import redis.clients.jedis.Jedis;
 @RequestMapping("test")
 public class testController {
 
-    @Autowired
-    private RedisConfig redisConfig;
-
-    @RequestMapping("testRedis")
-    public void getRedis(){
-        System.out.println("1234");
-        Jedis jedis = new Jedis("127.0.0.1",6379);
-        jedis.set("22","333");
-        // jedisTemplate.set("测试","124");
-       // jedisTemplate.close();
-    };
+//    @Autowired
+//    private RedisConfig redisConfig;
+//
+//    @RequestMapping("testRedis")
+//    public void getRedis(){
+//        System.out.println("1234");
+//        Jedis jedis = new Jedis("127.0.0.1",6379);
+//        jedis.set("22","333");
+//        // jedisTemplate.set("测试","124");
+//       // jedisTemplate.close();
+//    };
 
 
 }

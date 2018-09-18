@@ -16,5 +16,6 @@
         <module>ace-interface</module>
         <module>ace-generator</module>
         <module>ace-tool</module>
+        <module>ace-messages</module>
     </modules>
 </project>

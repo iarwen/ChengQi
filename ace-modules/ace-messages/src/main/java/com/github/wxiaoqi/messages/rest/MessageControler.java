@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
+import java.util.Map;
+
 /**
  *  梁健
  *  2018/9/17 15:49
@@ -37,17 +39,29 @@ public class MessageControler {
      * 2018/09/17 15:45
      * @param messages
      */
-    @RequestMapping(value = "push",method = RequestMethod.POST)
+    @RequestMapping(value = "/push",method = RequestMethod.POST)
     @ResponseBody
     public ResultUtil releaseTheMessage(@RequestBody Messages messages){
         return messageService.releaseTheMessage(messages);
     };
 
 
-
-
-
-
+    /**
+     *
+     * 功能描述:
+     *
+     * @param:
+     * @return:
+     * @auther: 梁建
+     * @date: 2018/9/18 13:00
+     * @description:
+     * @return:
+     */
+    @RequestMapping(value = "/push/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    @ResponseBody
+    public  ResultUtil agencyToHaveDone(Map hashMap){
+        return messageService.agencyToHaveDone(hashMap);
+    };
 
 
 
@@ -91,4 +105,6 @@ public class MessageControler {
         log.info("传入参数uid:"+ uid + "信息id:"+ message_id);
         return settingService.settingRead(uid,message_id);
     };
+
+
 }

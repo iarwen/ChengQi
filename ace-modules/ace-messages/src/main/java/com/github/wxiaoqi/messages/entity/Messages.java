@@ -12,7 +12,7 @@ import lombok.ToString;
 public class Messages {
 
     //主键ID
-    private Long id;
+    private String id;
     //发送时间，由push服务生成
     private String time;
     //消息类型，message: 通知消息， business: 业务消息
@@ -34,6 +34,19 @@ public class Messages {
     //消息体
     private MessagesBody body;
 
+    public boolean isReaded() {
+        return readed;
+    }
 
+    public void setReaded(boolean readed) {
+        this.readed = readed;
+    }
 
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
 }
