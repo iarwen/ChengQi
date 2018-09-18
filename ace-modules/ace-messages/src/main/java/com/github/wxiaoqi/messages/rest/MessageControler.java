@@ -8,12 +8,10 @@ import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,10 +55,37 @@ public class MessageControler {
      * @description:
      * @return:
      */
-    @RequestMapping(value = "/push/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    @RequestMapping(value = "/push/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
     @ResponseBody
-    public  ResultUtil agencyToHaveDone(Map hashMap){
+    public  ResultUtil agencyToHaveDone(@PathVariable Long uid,@PathVariable String message_id){
+        System.out.println("uid ---> "+uid);
+        System.out.println("message_id ---> "+message_id);
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("uid",uid);
+        hashMap.put("message_id",message_id);
         return messageService.agencyToHaveDone(hashMap);
+    };
+
+
+    /**
+     *
+     * 功能描述:
+     *
+     * @param:
+     * @return:
+     * @auther: 梁建
+     * @date: 2018/9/18 13:00
+     * @description:
+     * @return:
+     */
+    @RequestMapping(value = "/push/{uid}/messages/forms/{businessKey}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public  ResultUtil agencyToHaveDoneByBusinessKey(@PathVariable Long uid,@PathVariable String businessKey){
+        log.info("入参为：    uid = "+uid+"  businessKey = "+businessKey);
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("uid",uid);
+        hashMap.put("businessKey",businessKey);
+        return messageService.agencyToHaveDoneByBusinessKey(hashMap);
     };
 
 
