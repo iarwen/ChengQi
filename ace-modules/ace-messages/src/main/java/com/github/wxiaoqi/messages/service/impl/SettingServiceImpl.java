@@ -5,6 +5,7 @@ import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -28,6 +29,12 @@ public class SettingServiceImpl implements SettingService {
      */
     @Override
     public ResultUtil settingRead(Long uid, Long message_id) {
+        if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(message_id)) {
+            log.error("传入uid为空或者message_id为空");
+            ResultUtil.returnError("传入uid为空或者message_id为空", 500);
+        }
+
+
         return null;
     }
 }
