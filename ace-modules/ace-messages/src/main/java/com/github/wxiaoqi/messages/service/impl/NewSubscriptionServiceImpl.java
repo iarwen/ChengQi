@@ -39,7 +39,7 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
             ResultUtil.returnError("传入uid为空", 500);
         }
         try {
-            jedis.blpop(60, "");
+            jedis.blpop(60, "user:" + uid + ":todo:channel", "user:" + uid + ":message:channel");
             //阻塞redis设置一分钟的过期时间,监控频道
             jedis.subscribe(new JedisPubSub() {
                 @Override
