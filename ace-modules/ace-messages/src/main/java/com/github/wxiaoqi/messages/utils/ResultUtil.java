@@ -43,6 +43,13 @@ public class ResultUtil implements Serializable {
         result.setErrmsg(msg);
         return result;
     }
+    //默认错误返回
+    public static ResultUtil returnError(String msg,Integer status) {
+        ResultUtil result = new ResultUtil();
+        result.setStatus(500);
+        result.setErrmsg(msg);
+        return result;
+    }
 
     //成功返回
     public static ResultUtil returnSuccess(String msg) {
