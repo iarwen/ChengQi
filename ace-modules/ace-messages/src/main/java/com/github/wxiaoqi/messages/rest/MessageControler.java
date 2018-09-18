@@ -8,10 +8,7 @@ import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Map;
@@ -101,9 +98,25 @@ public class MessageControler {
      */
     @RequestMapping(value = "push/{uid}/messages/{message_id}/read",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingRead (Long uid,Long message_id){
+    public ResultUtil settingRead (Long uid,String message_id){
         log.info("传入参数uid:"+ uid + "信息id:"+ message_id);
         return settingService.settingRead(uid,message_id);
+    };
+    /**
+     *
+     * 功能描述: 全部置已读
+     *
+     * @param:
+     * @return:
+     * @auther: JJY
+     * @date: 2018/9/18
+     */
+    @RequestMapping(value = "push/{uid}/messages/all_read?page={pageNum}&pageSize={pageSize}",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultUtil settingAllRead (@PathVariable Long uid,
+                                      @PathVariable Long pageNum,@PathVariable Long pageSize){
+        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
+        return settingService.settingAllRead(uid,pageNum,pageSize);
     };
 
 

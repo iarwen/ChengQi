@@ -11,5 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface SettingService {
 
-    ResultUtil settingRead(Long uid, Long message_id);
+    ResultUtil settingRead(Long uid, String message_id);
+
+    ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize);
 }
