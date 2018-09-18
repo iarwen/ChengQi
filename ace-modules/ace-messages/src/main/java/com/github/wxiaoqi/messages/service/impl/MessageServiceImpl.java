@@ -73,7 +73,7 @@ public class MessageServiceImpl implements MessageService {
             }
             log.info("开始将消息存入消息列表完成,开始将消息存入Channel");
             boolean flag2 = saveMessageInChannel(messages, hashMap);
-            if(flag2){
+            if(!flag2){
                 log.info("消息存入管道失败,开始清除Redis信息");
                 String msg = messages.getType().equals("message")== true ? "message": "todo";
                 jedis.zrem("user:" +  hashMap.get("user")+ ":"+msg+":zset",JSON.toJSONString(messages));
@@ -201,6 +201,7 @@ public class MessageServiceImpl implements MessageService {
                     log.info("消息存入 Chnnal 完成");
                 }
             }
+            jedis.close();
             return ResultUtil.returnSuccess();
         }catch (Exception e){
             log.info("转已办异常");
