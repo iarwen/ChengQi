@@ -12,7 +12,7 @@ import lombok.ToString;
 public class Messages {
 
     //主键ID
-    private String id;
+    private Long id;
     //发送时间，由push服务生成
     private String time;
     //消息类型，message: 通知消息， business: 业务消息
