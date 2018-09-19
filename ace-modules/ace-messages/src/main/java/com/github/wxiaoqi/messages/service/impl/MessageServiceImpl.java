@@ -1,23 +1,13 @@
 package com.github.wxiaoqi.messages.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.messages.entity.Messages;
-import com.github.wxiaoqi.messages.entity.MessagesBody;
-import com.github.wxiaoqi.messages.redisconfig.RedisConfig;
 import com.github.wxiaoqi.messages.service.MessageService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
-import com.github.wxiaoqi.messages.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
-import sun.plugin2.message.Message;
 
 import java.util.*;
 
@@ -31,8 +21,7 @@ import java.util.*;
 //@Transactional(rollbackFor = Exception.class,readOnly = true)
 public class MessageServiceImpl implements MessageService {
 
-    @Autowired
-    private Jedis jedis;
+    Jedis jedis = new Jedis("127.0.0.1",6379);
 
     /**
      * 功能描述:

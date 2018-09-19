@@ -3,7 +3,6 @@ package com.github.wxiaoqi.messages.service.impl;
 import com.github.wxiaoqi.messages.service.NewSubscriptionService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -19,7 +18,7 @@ import redis.clients.jedis.JedisPubSub;
 @Slf4j
 public class NewSubscriptionServiceImpl implements NewSubscriptionService {
 
-    String messages = new String();
+    String messages = "";
 
     Jedis jedis = new Jedis("127.0.0.1",6379);
 
@@ -32,14 +31,26 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
      * @date: 2018/9/18
      */
     @Override
-    @Async
     public ResultUtil newSubscription(Long uid) {
         if (ObjectUtils.isEmpty(uid)) {
             log.error("传入uid为空");
             ResultUtil.returnError("传入uid为空", 500);
         }
+        //启动新的线程
+        new Thread(() -> {
+            Jedis jedis = new Jedis("127.0.0.1",6379);
+            try {
+                String message = "";
+                Thread.sleep(5000);
+                jedis.publish("user:"+999999+":message:channel", message);
+               log.info("==============添加uid=999999的模拟信息成功=========="+message);
+                jedis.close();
+                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
         try {
-            //阻塞redis设置一分钟的过期时间,监控频道
             jedis.subscribe(new JedisPubSub() {
                 @Override
                 public void onMessage(String channel, String message) {
@@ -48,7 +59,7 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
                     messages = message;
                     unsubscribe();
                 }
-            }, "user:" + uid + ":todo:channel", "user:" + uid + ":message:channel");
+            }, "user:" + uid + ":todo:channel", "user:" + uid + ":message:channel","user:"+999999+":message:channel");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,25 +68,4 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
         jedis.close();
         return ResultUtil.returnSuccess(messages);
     }
-    /**
-     *
-     * 功能描述: 阻塞redis设置一分钟的过期时间,监控频道
-     *
-     * @param:
-     * @return:
-     * @auther: JJY
-     * @date: 2018/9/19
-     */
-    @Async
-    public void addMessage(){
-    try {
-        Thread.sleep(60000);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-
-    }
-
-
 }
