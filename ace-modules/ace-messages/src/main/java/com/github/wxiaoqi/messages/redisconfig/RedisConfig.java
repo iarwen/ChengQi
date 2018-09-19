@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 @Configuration
@@ -26,6 +25,7 @@ public class RedisConfig {
     public Jedis jedisTemplate(){
         logger.info("开始连接Redis");
         if(redisHost!=null && redisPort!=null){
+            logger.info("Redis链接超时尝试链接本地Redis");
             defaultHost = redisHost;
             defaultPort = redisPort;
         }

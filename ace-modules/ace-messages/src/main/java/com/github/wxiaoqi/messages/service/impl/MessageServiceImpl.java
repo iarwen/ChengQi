@@ -5,10 +5,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.entity.MessagesBody;
+import com.github.wxiaoqi.messages.redisconfig.RedisConfig;
 import com.github.wxiaoqi.messages.service.MessageService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import com.github.wxiaoqi.messages.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -28,7 +31,8 @@ import java.util.*;
 //@Transactional(rollbackFor = Exception.class,readOnly = true)
 public class MessageServiceImpl implements MessageService {
 
-    Jedis jedis = new Jedis("127.0.0.1",6379);
+    @Autowired
+    private Jedis jedis;
 
     /**
      * 功能描述:
@@ -43,13 +47,11 @@ public class MessageServiceImpl implements MessageService {
         try{
             log.info("传入的参数为："+JSON.toJSONString(messages));
             if(ObjectUtils.isEmpty(messages) || Objects.isNull(messages)){
-             ResultUtil.returnError("消息体为空无法发布");
+             return ResultUtil.returnError("消息体为空无法发布");
             };
             log.info("开始生成 消息ID 和 发送时间");
-            String time = TimeUtils.getTimeStamp();
-            int radomNumber = (int)((Math.random()*9+1)*100000);
-            messages.setId(messages.getType().toUpperCase()+""+time+""+radomNumber);
-            messages.setTime(TimeUtils.getTime());
+            Long incrId = getIncrId();
+            messages.setId(incrId);
             log.info("生成的消息ID为："+messages.getId());
             log.info("消息发送的时间为："+messages.getTime());
 
@@ -67,14 +69,19 @@ public class MessageServiceImpl implements MessageService {
             }
 
             log.info("开始将消息存入消息列表");
+            if (!"message".equals(messages.getType()) && !"business".equals(messages.getType())) return ResultUtil.returnError("消息类型不存在",404);
             boolean flag1 = saveMessageInRedis(messages,hashMap);
             if(!flag1){
-                ResultUtil.returnError("消息存入消息列表失败");
+                return  ResultUtil.returnError("消息存入消息列表失败");
             }
-            log.info("开始将消息存入消息列表完成,开始将消息存入Channel");
+            log.info("存入消息列表完成,开始将消息存入Channel");
             boolean flag2 = saveMessageInChannel(messages, hashMap);
             if(!flag2){
-                ResultUtil.returnError("消息存入管道失败");
+                log.info("消息存入管道失败,开始清除Redis信息");
+                String msg = messages.getType().equals("message")== true ? "message": "todo";
+                jedis.zrem("user:" +  hashMap.get("user")+ ":"+msg+":zset",JSON.toJSONString(messages));
+                jedis.close();
+                return ResultUtil.returnError("消息存入管道失败");
             }
             log.info("Channel存储完毕");
             return ResultUtil.returnSuccess();
@@ -83,8 +90,6 @@ public class MessageServiceImpl implements MessageService {
             e.printStackTrace();
             //  TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); //手动开启事务回滚
             return  ResultUtil.returnError("发布信息异常",500,e);
-        }finally {
-            jedis.close();
         }
     }
 
@@ -106,25 +111,78 @@ public class MessageServiceImpl implements MessageService {
             Set<String> zrange = jedis.zrange("user:" + uid + ":todo:zset", 0, -1);
             log.info("Redis 待转的数据为 ： "+ zrange);
             Iterator<String> iterator = zrange.iterator();
+            if(iterator.hasNext() == false) return  ResultUtil.returnError("暂无消息可以转 已办");
             while (iterator.hasNext()){
                 Messages  messages = JSON.parseObject(iterator.next(),Messages.class);
                 if(messages.isRemoved() == false){
-                    ResultUtil.returnError("该消息已经被转办");
+                    return  ResultUtil.returnError("该消息已经被转办");
                 }else if (messages.getId().equals(hashMap.get("message_id"))){
                     log.info("开始删除待转办的数据："+JSON.toJSON(messages));
                     jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
                     log.info("删除完毕，开始查询已办列表信息");
-
-                    Long userCount = jedis.zcard("user:"+hashMap.get("user")+":message:zset");
-                    if (Objects.isNull(userCount) || userCount == 0) {
-                        userCount = 0L;
-                    }
-                    log.info("当前已办消息列表中有： "+userCount+" 条数据");
-
                     log.info("开始添加已办信息列表");
-                    jedis.zadd("user:"+hashMap.get("user")+":done:zset",Double.valueOf(++userCount),JSON.toJSONString(messages));
+                    jedis.zadd("user:"+hashMap.get("uid")+":done:zset",messages.getId(),JSON.toJSONString(messages));
+                    log.info("转已办完毕,将消息存入 channel");
+                    hashMap.put("user",hashMap.get(uid));
+                    boolean flag = saveMessageInChannel(messages, hashMap);
+                    if(flag == false){
+                        jedis.close();
+                        return ResultUtil.returnError("消息存入 user:"+hashMap.get("uid")+":done:channel  失败");
+                    }
+                    jedis.close();
                 }
             }
+            return ResultUtil.returnSuccess();
+        }catch (Exception e){
+            log.info("转已办异常");
+            e.printStackTrace();
+            return  ResultUtil.returnError("发布信息异常",500,e);
+        }
+    }
+
+
+    /**
+     *
+     * 功能描述:
+     *
+     * @param: hashMap
+     * @auther: 梁建
+     * @date: 2018/9/18 13:00
+     * @description: 转已办
+     * @return: status
+     */
+    @Override
+    public ResultUtil agencyToHaveDoneByBusinessKey(HashMap<String, Object> hashMap) {
+        try {
+            log.info("开始转 已办");
+            String uid = hashMap.get("uid").toString();
+            Set<String> zrange = jedis.zrange("user:" + uid + ":todo:zset", 0, -1);
+            log.info("Redis 待转的数据为 ： "+ zrange);
+            Iterator<String> iterator = zrange.iterator();
+            if(iterator.hasNext() == false) return  ResultUtil.returnError("暂无消息可以转 已办");
+            while (iterator.hasNext()){
+                Messages  messages = JSON.parseObject(iterator.next(),Messages.class);
+                Long businessKey = messages.getBody().getBusinessKey();
+                if(messages.isRemoved() == false){
+                    return  ResultUtil.returnError("该消息已经被转办");
+                }else if ((businessKey+"").equals(hashMap.get("businessKey"))){
+                    log.info("开始删除待转办的数据："+JSON.toJSON(messages));
+                    jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
+
+                    log.info("开始添加已办信息列表");
+                    jedis.zadd("user:"+hashMap.get("uid")+":done:zset",messages.getId(),JSON.toJSONString(messages));
+                    log.info("已办信息列表添加完成");
+
+                    log.info("开始将消息存入 Chnnal");
+                    hashMap.put("user",uid);
+                    boolean flag = saveMessageInChannel(messages, hashMap);
+                    if(flag == false){
+                        return ResultUtil.returnError("消息存入 user:"+hashMap.get("uid")+":done:channel  失败");
+                    }
+                    log.info("消息存入 Chnnal 完成");
+                }
+            }
+            jedis.close();
             return ResultUtil.returnSuccess();
         }catch (Exception e){
             log.info("转已办异常");
@@ -145,19 +203,18 @@ public class MessageServiceImpl implements MessageService {
      */
     public boolean saveMessageInRedis(Messages messages, Map hashMap){
         try {
-            //查询Redis中的消息数量
-            Long userCount = jedis.zcard("user:"+hashMap.get("user")+":message:zset");
-            if (Objects.isNull(userCount) || userCount == 0) {
-                userCount = 0L;
-            }
             //在redis中添加消息列表
             if("message".equals(messages.getType())){
                 //通知消息列表
-                jedis.zadd("user:"+hashMap.get("user")+":message:zset",Double.valueOf(++userCount),JSON.toJSONString(messages));
+                jedis.zadd("user:"+hashMap.get("user")+":message:zset",messages.getId(),JSON.toJSONString(messages));
             }else if("business".equals(messages.getType())){
                 //代办消息列表
-                jedis.zadd("user:"+hashMap.get("user")+":todo:zset",Double.valueOf(++userCount),JSON.toJSONString(messages));
+                jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+            }else{
+                log.info("未知的消息类型");
+                return false;
             }
+
             jedis.close();
             return true;
         }catch (Exception e){
@@ -168,7 +225,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      *
      * 功能描述:
-     * @param: Messages
+     * @param: Messages hashMap
      * @auther: 梁健
      * @date: 2018/9/18 9:42
      * @description: 将消息存入管道
@@ -178,14 +235,21 @@ public class MessageServiceImpl implements MessageService {
         try {
             //查询Redis中的消息数量
             Long userCount = jedis.zcard("user");
-            if (Objects.isNull(userCount) || userCount == 0) {
-                userCount = 0L;
-            }
             //在频道中添加消息
             if("message".equals(messages.getType())){
                 jedis.publish("user:"+hashMap.get("user")+":message:channel",JSON.toJSONString(messages));
+                log.info("已放入 消息通知 Channel : "+"user:"+hashMap.get("user")+":message:channel");
             }else if("business".equals(messages.getType())){
-                jedis.publish("user:"+hashMap.get("user")+":todo:channel",JSON.toJSONString(messages));
+                if(messages.isRemoved() == false){
+                    jedis.publish("user:"+hashMap.get("user")+":done:channel",JSON.toJSONString(messages));
+                    log.info("已放入已办 Channel : "+"user:"+hashMap.get("user")+":done:channel");
+                }else if (messages.isRemoved() == true){
+                    jedis.publish("user:"+hashMap.get("user")+":todo:channel",JSON.toJSONString(messages));
+                    log.info("已放入待办 Channel : "+"user:"+hashMap.get("user")+":todo:channel");
+                }else {
+                    log.info("未知消息无法放入 Channel");
+                    return false;
+                }
             }
             jedis.close();
             return true;
@@ -194,5 +258,13 @@ public class MessageServiceImpl implements MessageService {
             return false;
         }
     };
+
+    /***
+     *  getIncrId
+     * @return
+     */
+    public Long getIncrId(){
+        return jedis.incr("mortor");
+    }
 
 }
