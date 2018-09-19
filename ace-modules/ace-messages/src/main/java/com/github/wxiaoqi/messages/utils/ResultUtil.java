@@ -22,6 +22,8 @@ public class ResultUtil implements Serializable {
 
     //提示信息
     private String errmsg;
+    //提示信息
+    private String message;
 
     //异常
     private Exception error;
@@ -55,7 +57,7 @@ public class ResultUtil implements Serializable {
     public static ResultUtil returnSuccess(String msg) {
         ResultUtil result = new ResultUtil();
         result.setStatus(200);
-        result.setErrmsg(msg);
+        result.setMessage(msg);
         return result;
     }
 
@@ -63,6 +65,13 @@ public class ResultUtil implements Serializable {
     public static ResultUtil returnSuccess() {
         ResultUtil result = new ResultUtil();
         result.setStatus(200);
+        return result;
+    }
+    //成功返回
+    public static ResultUtil returnSuccess(Object object) {
+        ResultUtil result = new ResultUtil();
+        result.setStatus(200);
+        result.setContent(object);
         return result;
     }
 }

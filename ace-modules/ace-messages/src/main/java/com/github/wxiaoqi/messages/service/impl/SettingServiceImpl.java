@@ -5,7 +5,6 @@ import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -22,8 +21,7 @@ import java.util.Set;
 @Service
 public class SettingServiceImpl implements SettingService {
 
-    @Autowired
-    private Jedis jedis;
+    Jedis jedis = new Jedis("127.0.0.1",6379);
     /**
      * 功能描述: 设置已读
      *
@@ -87,8 +85,8 @@ public class SettingServiceImpl implements SettingService {
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============设置全部已读开始===========");
-            start = pageNum * pageSize + 1 ;
-            stop = pageNum * pageSize + 1 + pageSize;
+            start = pageNum * pageSize  ;
+            stop = pageNum * pageSize  + pageSize;
             Set<String> zrange = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             log.info("Redis 待转的数据为 ： "+ zrange);
             //迭代器
@@ -109,9 +107,12 @@ public class SettingServiceImpl implements SettingService {
                     jedis.zadd("user:"+uid+":message:zset",score, JSON.toJSONString(messages));
                     log.info("==========插入成功========");
                 }
-                jedis.close();
+
+
             }
-            return ResultUtil.returnSuccess("设置已读成功");
+            Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
+            jedis.close();
+            return ResultUtil.returnSuccess(all);
         } catch (Exception e) {
             log.info("设置已读异常");
             e.printStackTrace();
