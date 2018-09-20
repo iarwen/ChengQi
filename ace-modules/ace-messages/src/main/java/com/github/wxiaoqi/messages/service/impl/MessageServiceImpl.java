@@ -21,11 +21,8 @@ import java.util.*;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-   // Jedis jedis = new Jedis("127.0.0.1",6379);
 
     private  Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
-
-    //private  Jedis jedis;
 
     /**
      * 功能描述:
