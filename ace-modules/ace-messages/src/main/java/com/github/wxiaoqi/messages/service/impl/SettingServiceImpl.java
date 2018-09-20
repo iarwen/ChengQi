@@ -1,6 +1,7 @@
 package com.github.wxiaoqi.messages.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.wxiaoqi.messages.config.RedisConfig;
 import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
@@ -24,8 +25,10 @@ public class SettingServiceImpl implements SettingService {
 
     //Jedis jedis = new Jedis("127.0.0.1",6379);
 
-    @Autowired
-    private Jedis jedis;
+//    @Autowired
+//    private Jedis jedis;
+
+    private  Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
 
     /**
      * 功能描述: 设置已读

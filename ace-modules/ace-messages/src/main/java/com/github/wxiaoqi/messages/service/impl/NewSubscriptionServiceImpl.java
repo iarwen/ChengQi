@@ -1,5 +1,6 @@
 package com.github.wxiaoqi.messages.service.impl;
 
+import com.github.wxiaoqi.messages.config.RedisConfig;
 import com.github.wxiaoqi.messages.service.NewSubscriptionService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,10 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
      private String messages = "";
 
    // Jedis jedis = new Jedis("127.0.0.1",6379);
-     @Autowired
-     private Jedis jedis;
+     //@Autowired
+     //private Jedis jedis;
+     private  Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
+
     /**
      * 功能描述: 消息订阅
      *
@@ -40,7 +43,7 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
         }
         //启动新的线程
         new Thread(() -> {
-            Jedis jedis = new Jedis("127.0.0.1",6379);
+              Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
             try {
                 String message = "";
                 Thread.sleep(60000);
