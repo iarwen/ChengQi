@@ -14,4 +14,6 @@ public interface SettingService {
     ResultUtil settingRead(Long uid, String message_id);
 
     ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize);
+
+    ResultUtil settingList(Long uid, Long pageNum, Long pageSize);
 }

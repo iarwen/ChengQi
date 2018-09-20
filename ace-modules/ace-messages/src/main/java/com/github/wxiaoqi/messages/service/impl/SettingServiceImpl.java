@@ -6,7 +6,6 @@ import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -93,8 +92,8 @@ public class SettingServiceImpl implements SettingService {
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============设置全部已读开始===========");
-            start = pageNum * pageSize  ;
-            stop = pageNum * pageSize  + pageSize;
+            start = (pageNum -1) * pageSize  ;
+            stop = (pageNum -1) * pageSize  + pageSize;
             Set<String> zrange = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             log.info("Redis 待转的数据为 ： "+ zrange);
             //迭代器
@@ -127,4 +126,33 @@ public class SettingServiceImpl implements SettingService {
             return  ResultUtil.returnError("设置已读异常",500,e);
     }
 }
+    /**
+     * 功能描述: 获取历史列表
+     *
+     * @param: uid
+     * @return: Result
+     * @auther: JJY
+     * @date: 2018/9/18
+     */
+    @Override
+    public ResultUtil settingList(Long uid, Long pageNum, Long pageSize) {
+        try {
+            Long start;
+            Long stop;
+            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
+                log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
+                ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
+            }
+            log.info("=============查询历史信息开始===========");
+            start = (pageNum -1) * pageSize  ;
+            stop = (pageNum -1) * pageSize  + pageSize;
+            Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
+            jedis.close();
+            return ResultUtil.returnSuccess(all);
+        } catch (Exception e) {
+            log.info("设置已读异常");
+            e.printStackTrace();
+            return  ResultUtil.returnError("设置已读异常",500,e);
+        }
+    }
 }
