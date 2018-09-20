@@ -14,8 +14,8 @@ import redis.clients.jedis.Jedis;
 
 import java.util.Objects;
 
-//@Configuration
-@EnableApolloConfig
+@Configuration
+//@EnableApolloConfig
 public class RedisConfig {
 
     private Logger logger = LoggerFactory.getLogger(RedisConfig.class);
