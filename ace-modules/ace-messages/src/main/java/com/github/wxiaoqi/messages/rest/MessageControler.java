@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  梁健
@@ -144,6 +142,21 @@ public class MessageControler {
     public ResultUtil settingAllRead (@PathVariable Long uid, Long pageNum, Long pageSize){
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
         return settingService.settingAllRead(uid,pageNum,pageSize);
+    };
+    /**
+     *
+     * 功能描述: 全部置已读
+     *
+     * @param:
+     * @return:
+     * @auther: JJY
+     * @date: 2018/9/18
+     */
+    @RequestMapping(value = "push/{uid}/list",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultUtil settingAllRead (@PathVariable Long uid,String message, Long pageNum, Long pageSize){
+        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
+        return settingService.settingList(uid,pageNum,pageSize);
     };
 
 
