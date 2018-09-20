@@ -50,22 +50,21 @@ public class SettingServiceImpl implements SettingService {
             Iterator<String> iterator = zrange.iterator();
             while (iterator.hasNext()){
                 Messages messages = JSON.parseObject(iterator.next(),Messages.class);
-                if(messages.isReaded() == true){
-                    ResultUtil.returnError("该消息已读");
-                }else if (messages.getId().equals(message_id)){
-                    //获取score
-                    Double zscore = jedis.zscore("user:" + uid + ":message:zset",JSON.toJSONString(messages));
-                    log.info("score:"+zscore);
-                    log.info("开始删除待处理的数据："+JSON.toJSON(messages));
-                    jedis.zrem("user:" + uid + ":message:zset",JSON.toJSONString(messages));
-                    //修改为已读
-                    messages.setReaded(true);
-                    log.info("重新插入处理后信息");
-                    jedis.zadd("user:"+uid+":message:zset",zscore, JSON.toJSONString(messages));
-                    log.info("==========插入成功========");
+                if(messages.getId().toString().equals(message_id)){
+                        //获取score
+                        Double zscore = jedis.zscore("user:" + uid + ":message:zset", JSON.toJSONString(messages));
+                        log.info("score:" + zscore);
+                        log.info("开始删除待处理的数据：" + JSON.toJSON(messages));
+                        jedis.zrem("user:" + uid + ":message:zset", JSON.toJSONString(messages));
+                        //修改为已读
+                        messages.setReaded(true);
+                        log.info("重新插入处理后信息");
+                        jedis.zadd("user:" + uid + ":message:zset", zscore, JSON.toJSONString(messages));
+                        log.info("==========插入成功========");
+                        jedis.close();
+                        break;
+                    }
                 }
-                jedis.close();
-            }
             return ResultUtil.returnSuccess("设置已读成功");
         } catch (Exception e) {
             log.info("设置已读异常");
@@ -93,7 +92,7 @@ public class SettingServiceImpl implements SettingService {
             }
             log.info("=============设置全部已读开始===========");
             start = (pageNum -1) * pageSize  ;
-            stop = (pageNum -1) * pageSize  + pageSize;
+            stop = (pageNum -1) * pageSize  + pageSize - 1;
             Set<String> zrange = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             log.info("Redis 待转的数据为 ： "+ zrange);
             //迭代器
@@ -145,7 +144,7 @@ public class SettingServiceImpl implements SettingService {
             }
             log.info("=============查询历史信息开始===========");
             start = (pageNum -1) * pageSize  ;
-            stop = (pageNum -1) * pageSize  + pageSize;
+            stop = (pageNum -1) * pageSize  + pageSize - 1 ;
             Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             jedis.close();
             return ResultUtil.returnSuccess(all);
