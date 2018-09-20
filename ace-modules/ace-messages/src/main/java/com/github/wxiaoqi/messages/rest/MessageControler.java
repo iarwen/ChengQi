@@ -110,8 +110,8 @@ public class MessageControler {
   @RequestMapping(value = "push/{uid}/sub",method = RequestMethod.GET)
   @ResponseBody
   public ResultUtil newSubscription (@PathVariable Long uid){
-      log.info("传入参数uid:",uid);
-      return newSubscriptionService.newSubscription(uid);
+
+      log.info("传入参数uid:",uid);   return newSubscriptionService.newSubscription(uid);
   };
     /**
      *

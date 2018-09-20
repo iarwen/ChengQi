@@ -21,7 +21,7 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
 
      private String messages = "";
 
-     private  Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
+     private  Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
 
     /**
      * 功能描述: 消息订阅
@@ -39,10 +39,11 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
         }
         //启动新的线程
         new Thread(() -> {
-              Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
+              Jedis jedis =  new RedisConfig().jedisTemplate(Thread.class);
             try {
                 String message = "";
                 Thread.sleep(60000);
+                log.info("*************@@@@@@@@@@@@");
                 jedis.publish("user:"+999999+":message:channel", message);
                log.info("==============添加uid=999999的模拟信息成功=========="+message);
                 jedis.close();
