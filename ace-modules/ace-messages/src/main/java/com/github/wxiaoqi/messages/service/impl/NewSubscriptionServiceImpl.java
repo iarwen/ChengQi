@@ -21,9 +21,6 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
 
      private String messages = "";
 
-   // Jedis jedis = new Jedis("127.0.0.1",6379);
-     //@Autowired
-     //private Jedis jedis;
      private  Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
 
     /**
