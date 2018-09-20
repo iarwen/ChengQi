@@ -5,6 +5,7 @@ import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -21,7 +22,11 @@ import java.util.Set;
 @Service
 public class SettingServiceImpl implements SettingService {
 
-    Jedis jedis = new Jedis("127.0.0.1",6379);
+    //Jedis jedis = new Jedis("127.0.0.1",6379);
+
+    @Autowired
+    private Jedis jedis;
+
     /**
      * 功能描述: 设置已读
      *

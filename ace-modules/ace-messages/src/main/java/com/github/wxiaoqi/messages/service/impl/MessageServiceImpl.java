@@ -5,6 +5,7 @@ import com.github.wxiaoqi.messages.entity.Messages;
 import com.github.wxiaoqi.messages.service.MessageService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -18,10 +19,12 @@ import java.util.*;
  */
 @Slf4j
 @Service
-//@Transactional(rollbackFor = Exception.class,readOnly = true)
 public class MessageServiceImpl implements MessageService {
 
-    Jedis jedis = new Jedis("127.0.0.1",6379);
+   // Jedis jedis = new Jedis("127.0.0.1",6379);
+
+    @Autowired
+    private  Jedis jedis;
 
     /**
      * 功能描述:
@@ -52,13 +55,17 @@ public class MessageServiceImpl implements MessageService {
                 String[] split = str.split(":");
                 hashMap.put(split[0], split[1]);
             }
-            log.info("主送为：", JSON.toJSONString(hashMap));
+           // log.info("主送为：", JSON.toJSONString(hashMap));
             if(ObjectUtils.isEmpty(hashMap) || Objects.isNull(hashMap)){
                 ResultUtil.returnError("to 为空发布失败");
             }
 
             log.info("开始将消息存入消息列表");
-            if (!"message".equals(messages.getType()) && !"business".equals(messages.getType())) return ResultUtil.returnError("消息类型不存在",404);
+            if (!"message".equals(messages.getType()) && !"business".equals(messages.getType())) {
+                log.info("未知的消息类型: "+messages.getType());
+                return ResultUtil.returnError("未知消息类型: "+messages.getType(),404);
+            }
+
             boolean flag1 = saveMessageInRedis(messages,hashMap);
             if(!flag1){
                 return  ResultUtil.returnError("消息存入消息列表失败");
@@ -196,11 +203,13 @@ public class MessageServiceImpl implements MessageService {
             if("message".equals(messages.getType())){
                 //通知消息列表
                 jedis.zadd("user:"+hashMap.get("user")+":message:zset",messages.getId(),JSON.toJSONString(messages));
+                log.info("消息已存入通知消息列表 : user:"+hashMap.get("user")+":message:zset");
             }else if("business".equals(messages.getType())){
                 //代办消息列表
                 jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+                log.info("消息已存入代办消息列表 : user:"+hashMap.get("user")+":todo:zset");
             }else{
-                log.info("未知的消息类型");
+                log.info("未知的消息类型: "+messages.getType());
                 return false;
             }
 

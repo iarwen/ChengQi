@@ -3,6 +3,7 @@ package com.github.wxiaoqi.messages.service.impl;
 import com.github.wxiaoqi.messages.service.NewSubscriptionService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import redis.clients.jedis.Jedis;
@@ -18,10 +19,11 @@ import redis.clients.jedis.JedisPubSub;
 @Slf4j
 public class NewSubscriptionServiceImpl implements NewSubscriptionService {
 
-    String messages = "";
+     private String messages = "";
 
-    Jedis jedis = new Jedis("127.0.0.1",6379);
-
+   // Jedis jedis = new Jedis("127.0.0.1",6379);
+     @Autowired
+     private Jedis jedis;
     /**
      * 功能描述: 消息订阅
      *
@@ -41,7 +43,7 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
             Jedis jedis = new Jedis("127.0.0.1",6379);
             try {
                 String message = "";
-                Thread.sleep(5000);
+                Thread.sleep(60000);
                 jedis.publish("user:"+999999+":message:channel", message);
                log.info("==============添加uid=999999的模拟信息成功=========="+message);
                 jedis.close();
