@@ -117,9 +117,11 @@ public class MessageServiceImpl implements MessageService {
             if(iterator.hasNext() == false) return  ResultUtil.returnError("暂无消息可以转 已办");
             while (iterator.hasNext()){
                 Messages  messages = JSON.parseObject(iterator.next(),Messages.class);
-                if(messages.isRemoved() == false){
-                    return  ResultUtil.returnError("该消息已经被转办");
-                }else if (messages.getId().toString().equals(hashMap.get("message_id"))){
+                if (messages.getId().toString().equals(hashMap.get("message_id"))){
+                    if(messages.isRemoved() == false){
+                        log.info("数据异常，代办列表中出现已办数据，请检查代办数据列表");
+                        return  ResultUtil.returnError("该消息为已办数据,不可再 转 已办");
+                    }
                     log.info("Redis 待转的数据为 ： "+ messages);
                     log.info("开始删除待转办的数据："+JSON.toJSON(messages));
                     jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
@@ -178,9 +180,12 @@ public class MessageServiceImpl implements MessageService {
             while (iterator.hasNext()){
                 Messages  messages = JSON.parseObject(iterator.next(),Messages.class);
                 Long businessKey = messages.getBody().getBusinessKey();
-                if(messages.isRemoved() == false){
-                    return  ResultUtil.returnError("该消息已经被转办");
-                }else if ((businessKey+"").equals(hashMap.get("businessKey"))){
+                if ((businessKey+"").equals(hashMap.get("businessKey"))){
+                    if(messages.isRemoved() == false){
+                        log.info("数据异常，代办列表中出现已办数据，请检查代办数据列表");
+                        return  ResultUtil.returnError("该消息为已办数据,不可再 转 已办");
+                    }
+
                     log.info("开始删除待转办的数据："+JSON.toJSON(messages));
                     jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
 
@@ -225,14 +230,19 @@ public class MessageServiceImpl implements MessageService {
                 jedis.zadd("user:"+hashMap.get("user")+":message:zset",messages.getId(),JSON.toJSONString(messages));
                 log.info("消息已存入通知消息列表 : user:"+hashMap.get("user")+":message:zset");
             }else if("business".equals(messages.getType())){
-                //代办消息列表
-                jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
-                log.info("消息已存入代办消息列表 : user:"+hashMap.get("user")+":todo:zset");
+                //判断数据是否是已办数据
+                if(messages.isRemoved() == false){
+                    log.info("已办消息,不可存入待办消息记录列表。");
+                    return false;
+                }else {
+                    //代办消息列表
+                    jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+                    log.info("消息已存入代办消息列表 : user:"+hashMap.get("user")+":todo:zset");
+                }
             }else{
                 log.info("未知的消息类型: "+messages.getType());
                 return false;
             }
-
             jedis.close();
             return true;
         }catch (Exception e){
