@@ -92,8 +92,8 @@ public class SettingServiceImpl implements SettingService {
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============设置全部已读开始===========");
-            start = pageNum * pageSize  ;
-            stop = pageNum * pageSize  + pageSize;
+            start = (pageNum -1) * pageSize  ;
+            stop = (pageNum -1) * pageSize  + pageSize;
             Set<String> zrange = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             log.info("Redis 待转的数据为 ： "+ zrange);
             //迭代器
@@ -144,8 +144,8 @@ public class SettingServiceImpl implements SettingService {
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============查询历史信息开始===========");
-            start = pageNum * pageSize  ;
-            stop = pageNum * pageSize  + pageSize;
+            start = (pageNum -1) * pageSize  ;
+            stop = (pageNum -1) * pageSize  + pageSize;
             Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             jedis.close();
             return ResultUtil.returnSuccess(all);
