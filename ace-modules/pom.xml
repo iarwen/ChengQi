@@ -17,5 +17,6 @@
         <module>ace-generator</module>
         <module>ace-tool</module>
         <module>ace-messages</module>
+        <module>motor-draft</module>
     </modules>
 </project>

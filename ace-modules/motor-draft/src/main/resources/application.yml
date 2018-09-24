@@ -1,0 +1,120 @@
+logging:
+  level:
+    #        tk.mybatis: DEBUG
+    com.github.wxiaoqi.security.admin: DEBUG
+spring:
+  application:
+    name: motor-draft
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+  datasource:
+    name: test
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/chengqi?useUnicode=true&characterEncoding=UTF8
+    username: root
+    password: root
+    # \u4F7F\u7528druid\u6570\u636E\u6E90
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST:localhost}
+    port:  ${RABBIT_MQ_PORT:5672}
+    username: guest
+    password: guest
+  sleuth:
+    enabled: true
+    http:
+      legacy:
+        enabled: true
+server:
+  port: 8768
+
+eureka:
+  instance:
+    statusPageUrlPath: /actuator/info
+    healthCheckUrlPath: /actuator/health
+    # docker \u90E8\u7F72\u5F00\u542F
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+  client:
+    serviceUrl:
+      #            defaultZone: http://localhost:8761/eureka/
+      # docker \u90E8\u7F72\u5F00\u542F
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+# \u5FC5\u987B\u914D\u7F6E
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 100000
+  ConnectTimeout: 100000
+  MaxAutoRetries: 0
+  MaxAutoRetriesNextServer: 1
+  OkToRetryOnAllOperations: false
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 1000 ##\u5E76\u53D1\u6267\u884C\u7684\u6700\u5927\u7EBF\u7A0B\u6570\uFF0C\u9ED8\u8BA410
+      maxQueueSize: 1000 ##BlockingQueue\u7684\u6700\u5927\u961F\u5217\u6570
+      queueSizeRejectionThreshold: 500 ##\u5373\u4F7FmaxQueueSize\u6CA1\u6709\u8FBE\u5230\uFF0C\u8FBE\u5230queueSizeRejectionThreshold\u8BE5\u503C\u540E\uFF0C\u8BF7\u6C42\u4E5F\u4F1A\u88AB\u62D2\u7EDD
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 110000
+
+
+# \u914D\u7F6Eswagger
+swagger:
+  enabled: true
+  base-package: com.github.wxiaoqi.messages
+  title: motor-draft
+  version: 1.0.0.SNAPSHOT
+  description: \u8349\u7A3F\u7BB1\u7BA1\u7406\u670D\u52A1
+  contact:
+    name: draft
+
+auth:
+  serviceId: ace-auth
+  user:
+    token-header: Authorization
+  client:
+    id: motor-draft
+    secret: 123456
+    token-header: x-client-token
+
+#redis-cache \u76F8\u5173
+redis:
+  pool:
+    maxActive: 300
+    maxIdle: 100
+    maxWait: 1000
+  host: ${REDIS_HOST:192.168.0.1}
+  port:  ${REDIS_PORT:6379}
+  password:
+  timeout: 2000
+  # \u670D\u52A1\u6216\u5E94\u7528\u540D
+  sysName: ace-messages
+  enable: true
+  database: 0
