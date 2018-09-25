@@ -47,16 +47,16 @@ public class MessageServiceImpl implements MessageService {
 
             log.info("开始抽取主送消息");
             HashMap<String, Object> hashMap = new HashMap<>(16);
-            String[] to = messages.getTo();
-            //抽取 主送信息
-            for (String str : to) {
-                String[] split = str.split(":");
-                hashMap.put(split[0], split[1]);
-            }
-           // log.info("主送为：", JSON.toJSONString(hashMap));
-            if(ObjectUtils.isEmpty(hashMap) || Objects.isNull(hashMap)){
-                ResultUtil.returnError("to 为空发布失败");
-            }
+
+//            //抽取 主送信息
+//            for (String str : to) {
+//                String[] split = str.split(":");
+//                hashMap.put(split[0], split[1]);
+//            }
+//            // log.info("主送为：", JSON.toJSONString(hashMap));
+//            if(ObjectUtils.isEmpty(hashMap) || Objects.isNull(hashMap)){
+//                ResultUtil.returnError("to 为空发布失败");
+//            }
 
             log.info("开始将消息存入消息列表");
             if (!"message".equals(messages.getType()) && !"business".equals(messages.getType())) {
@@ -64,21 +64,35 @@ public class MessageServiceImpl implements MessageService {
                 return ResultUtil.returnError("未知消息类型: "+messages.getType(),404);
             }
 
-            boolean flag1 = saveMessageInRedis(messages,hashMap);
-            if(!flag1){
-                return  ResultUtil.returnError("消息存入消息列表失败");
+            String[] to = messages.getTo();
+            for (int i = 0;i < to.length -1;i++){
+                String type = to[i].split(":")[0];//获取当前用户的类型
+                String uid = to[i].split(":")[1];//获取当前用户的ID
+                if("user".equals(type)){
+                    boolean flag1 = saveMessageInRedis(messages,uid); //将消息存入redis
+                    if(!flag1) return  ResultUtil.returnError("消息存入消息列表失败");
+                    log.info("存入消息列表完成,开始将消息存入Channel");
+                    boolean flag2 = saveMessageInChannel(messages,uid);
+                    if(!flag2){
+                        log.info("消息存入管道失败,开始清除Redis信息");
+                        String msg = messages.getType().equals("message")== true ? "message": "todo";
+                        jedis.zrem("user:" +  hashMap.get("user")+ ":"+msg+":zset",JSON.toJSONString(messages));
+                        jedis.close();
+                        log.info("Redis 连接关闭");
+                        return ResultUtil.returnError("消息存入管道失败");
+                    }
+                    log.info("Channel存储完毕");
+                }else if("organ".equals(type)){
+                    log.info("organ  功能暂未更新");
+                    continue;
+                }else if("role".equals(type)){
+                    log.info("role  功能暂未更新");
+                    continue;
+                }else if("group".equals(type)){
+                    log.info("group  功能暂未更新");
+                    continue;
+                }
             }
-            log.info("存入消息列表完成,开始将消息存入Channel");
-            boolean flag2 = saveMessageInChannel(messages, hashMap);
-            if(!flag2){
-                log.info("消息存入管道失败,开始清除Redis信息");
-                String msg = messages.getType().equals("message")== true ? "message": "todo";
-                jedis.zrem("user:" +  hashMap.get("user")+ ":"+msg+":zset",JSON.toJSONString(messages));
-                jedis.close();
-                log.info("Redis 连接关闭");
-                return ResultUtil.returnError("消息存入管道失败");
-            }
-            log.info("Channel存储完毕");
             return ResultUtil.returnSuccess();
         }catch (Exception e){
             log.info("发布消息异常");
@@ -131,8 +145,7 @@ public class MessageServiceImpl implements MessageService {
                     messages.setRemoved(false);  // 转为已办消息
                     jedis.zadd("user:"+hashMap.get("uid")+":done:zset",messages.getId(),JSON.toJSONString(messages));
                     log.info("转已办完毕,将消息存入 channel");
-                    hashMap.put("user",hashMap.get(uid));
-                    boolean flag = saveMessageInChannel(messages, hashMap);
+                    boolean flag = saveMessageInChannel(messages,hashMap.get("uid").toString());
                     if(flag == false){
                         jedis.close();
                         log.info("Redis 连接关闭");
@@ -198,8 +211,7 @@ public class MessageServiceImpl implements MessageService {
                     log.info("已办信息列表添加完成");
 
                     log.info("开始将消息存入 Chnnal");
-                    hashMap.put("user",uid);
-                    boolean flag = saveMessageInChannel(messages, hashMap);
+                    boolean flag = saveMessageInChannel(messages, hashMap.get("uid").toString());
                     if(flag == false){
                         return ResultUtil.returnError("消息存入 user:"+hashMap.get("uid")+":done:channel  失败");
                     }
@@ -226,16 +238,23 @@ public class MessageServiceImpl implements MessageService {
      * @description: 将消息存储到消息列表
      * @return: boolean
      */
-    public boolean saveMessageInRedis(Messages messages, Map hashMap){
+    public boolean saveMessageInRedis(Messages messages,String uid){
         try {
             Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
+            //重新定义to
+            String[] newTo = {"user:"+uid};
+            messages.setTo(newTo);
             //在redis中添加消息列表
             if("message".equals(messages.getType())){
-                //通知消息列表
-                jedis.zadd("user:"+hashMap.get("user")+":message:zset",messages.getId(),JSON.toJSONString(messages));
-                log.info("消息已存入通知消息列表 : user:"+hashMap.get("user")+":message:zset");
+                 //通知消息列表
+                jedis.zadd("user:"+uid+":message:zset",messages.getId(),JSON.toJSONString(messages));
+                log.info("消息已存入通知消息列表 : user:"+uid+":message:zset");
+
             }else if("business".equals(messages.getType())){
-                jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+
+                    jedis.zadd("user:"+uid+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+                    log.info("消息已存入待办消息列表 : user:"+uid+":todo:zset");
+
 //                //判断数据是否是已办数据
 //                if(messages.isRemoved() == false){
 //                    log.info("已办消息,不可存入待办消息记录列表。");
@@ -265,22 +284,23 @@ public class MessageServiceImpl implements MessageService {
      * @description: 将消息存入管道
      * @return: boolean
      */
-    public boolean saveMessageInChannel(Messages messages,Map hashMap){
+    public boolean saveMessageInChannel(Messages messages,String uid){
         try {
             Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
-            //查询Redis中的消息数量
-            Long userCount = jedis.zcard("user");
+            //更新 To 内容
+            String[] newTo = {"user:"+uid};
+            messages.setTo(newTo);
             //在频道中添加消息
             if("message".equals(messages.getType())){
-                jedis.publish("user:"+hashMap.get("user")+":message:channel",JSON.toJSONString(messages));
-                log.info("已放入 消息通知 Channel : "+"user:"+hashMap.get("user")+":message:channel");
+                jedis.publish("user:"+uid+":message:channel",JSON.toJSONString(messages));
+                log.info("已放入 消息通知 Channel : "+"user:"+uid+":message:channel");
             }else if("business".equals(messages.getType())){
                 if(messages.isRemoved() == false){
-                    jedis.publish("user:"+hashMap.get("user")+":done:channel",JSON.toJSONString(messages));
-                    log.info("已放入已办 Channel : "+"user:"+hashMap.get("user")+":done:channel");
+                    jedis.publish("user:"+uid+":done:channel",JSON.toJSONString(messages));
+                    log.info("已放入已办 Channel : "+"user:"+uid+":done:channel");
                 }else if (messages.isRemoved() == true){
-                    jedis.publish("user:"+hashMap.get("user")+":todo:channel",JSON.toJSONString(messages));
-                    log.info("已放入待办 Channel : "+"user:"+hashMap.get("user")+":todo:channel");
+                    jedis.publish("user:"+uid+":todo:channel",JSON.toJSONString(messages));
+                    log.info("已放入待办 Channel : "+"user:"+uid+":todo:channel");
                 }else {
                     log.info("未知消息,请检查Message实体类是否出现改变");
                     return false;
