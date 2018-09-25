@@ -15,5 +15,5 @@ public interface SettingService {
 
     ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize);
 
-    ResultUtil settingList(Long uid, Long pageNum, Long pageSize);
+    ResultUtil settingList(Long uid, Long pageNum, Long pageSize,String type);
 }
