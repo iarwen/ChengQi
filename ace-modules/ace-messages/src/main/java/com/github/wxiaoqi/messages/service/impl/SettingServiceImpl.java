@@ -23,8 +23,6 @@ import java.util.Set;
 public class SettingServiceImpl implements SettingService {
 
 
-    private  Jedis jedis =  new RedisConfig().jedisTemplate(SettingServiceImpl.class);
-
     /**
      * 功能描述: 设置已读
      *
@@ -36,6 +34,7 @@ public class SettingServiceImpl implements SettingService {
     @Override
     public ResultUtil settingRead(Long uid, String message_id) {
         try {
+         Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
         if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(message_id)) {
             log.error("传入uid为空或者message_id为空");
             ResultUtil.returnError("传入uid为空或者message_id为空", 500);
@@ -80,6 +79,7 @@ public class SettingServiceImpl implements SettingService {
     public ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize) {
 
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
             Long start;
             Long stop;
             if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
@@ -132,6 +132,7 @@ public class SettingServiceImpl implements SettingService {
     @Override
     public ResultUtil settingList(Long uid, Long pageNum, Long pageSize) {
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
             Long start;
             Long stop;
             if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {

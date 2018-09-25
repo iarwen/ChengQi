@@ -88,7 +88,6 @@ public class RedisConfig{
                 logger.info("当前Redis连接的地址为： "+defHost+":"+defPort);
             }
             logger.info(tClass.getName()+"---->Redis连接完成");
-
         }catch (Exception e){
             e.printStackTrace();
             logger.info("Redis 连接异常: "+ JSON.toJSONString(e.getMessage()));

@@ -14,19 +14,11 @@
 
 	<properties>
 		<hystrix.version>1.5.12</hystrix.version>
-		<!-- MyBatis Generator -->
 		<!-- Java接口和实体类 -->
 		<targetJavaProject>${basedir}/src/main/java</targetJavaProject>
-		<targetMapperPackage>com.github.wxiaoqi.security.admin.mapper</targetMapperPackage>
-		<targetModelPackage>com.github.wxiaoqi.security.admin.entity</targetModelPackage>
+		<targetModelPackage>com.github.wxiaoqi.messages.entity</targetModelPackage>
 		<!-- XML生成路径 -->
 		<targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
-		<targetXMLPackage>mapper</targetXMLPackage>
-		<!-- 依赖版本 -->
-		<mapper.version>3.4.0</mapper.version>
-		<mybatis.version>3.3.1</mybatis.version>
-		<mybatis.spring.version>1.2.4</mybatis.spring.version>
-		<pagehelper.version>4.1.1</pagehelper.version>
 	</properties>
 
 	<dependencies>
@@ -124,19 +116,23 @@
             <artifactId>apollo-client</artifactId>
             <version>1.0.0</version>
         </dependency>
-    </dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+		<!--Spring AOP-->
+		<dependency>
+
+			<groupId>org.springframework.boot</groupId>
+
+			<artifactId>spring-boot-starter-aop</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>5.0.8.RELEASE</version>
+		</dependency>
+
+	</dependencies>
+
 
 	<build>
 		<finalName>ace-messages</finalName>
@@ -157,6 +153,15 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

@@ -22,7 +22,6 @@ import java.util.*;
 public class MessageServiceImpl implements MessageService {
 
 
-    private  Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
 
     /**
      * 功能描述:
@@ -34,6 +33,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public ResultUtil releaseTheMessage(Messages messages) {
+        Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
         try{
             log.info("传入的参数为："+JSON.toJSONString(messages));
             if(ObjectUtils.isEmpty(messages) || Objects.isNull(messages)){
@@ -101,6 +101,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ResultUtil agencyToHaveDone(Map hashMap) {
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
             log.info("开始验证参数");
             if(Objects.isNull(hashMap) || ObjectUtils.isEmpty(hashMap) ||
                     ObjectUtils.isEmpty(hashMap.get("uid").toString()) || Objects.isNull(hashMap.get("uid")) ||
@@ -162,6 +163,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ResultUtil agencyToHaveDoneByBusinessKey(HashMap<String, Object> hashMap) {
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
             log.info("开始验证参数");
             if(Objects.isNull(hashMap) || ObjectUtils.isEmpty(hashMap) ||
                ObjectUtils.isEmpty(hashMap.get("uid").toString()) || Objects.isNull(hashMap.get("uid")) ||
@@ -224,6 +226,7 @@ public class MessageServiceImpl implements MessageService {
      */
     public boolean saveMessageInRedis(Messages messages, Map hashMap){
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
             //在redis中添加消息列表
             if("message".equals(messages.getType())){
                 //通知消息列表
@@ -261,6 +264,7 @@ public class MessageServiceImpl implements MessageService {
      */
     public boolean saveMessageInChannel(Messages messages,Map hashMap){
         try {
+            Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
             //查询Redis中的消息数量
             Long userCount = jedis.zcard("user");
             //在频道中添加消息
@@ -292,6 +296,7 @@ public class MessageServiceImpl implements MessageService {
      * @return
      */
     public Long getIncrId(){
+        Jedis jedis =  new RedisConfig().jedisTemplate(MessageServiceImpl.class);
         return jedis.incr("mortor");
     }
 

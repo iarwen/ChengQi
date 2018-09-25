@@ -1,13 +1,18 @@
 package com.github.wxiaoqi.messages.rest;
 
+import com.github.wxiaoqi.messages.customannotation.NonEmpty;
 import com.github.wxiaoqi.messages.entity.Messages;
+import com.github.wxiaoqi.messages.entity.TestNotNull;
 import com.github.wxiaoqi.messages.service.MessageService;
 import com.github.wxiaoqi.messages.service.NewSubscriptionService;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,7 +23,7 @@ import java.util.HashMap;
  *  消息推送Controller
  */
 @Controller
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/push")
 @Slf4j
 public class MessageControler {
 
@@ -35,7 +40,7 @@ public class MessageControler {
      * 2018/09/17 15:45
      * @param messages
      */
-    @RequestMapping(value = "/push",method = RequestMethod.POST)
+    @RequestMapping(value = "",method = RequestMethod.POST)
     @ResponseBody
     public ResultUtil releaseTheMessage(@RequestBody Messages messages){
         return messageService.releaseTheMessage(messages);
@@ -53,7 +58,7 @@ public class MessageControler {
      * @description:
      * @return:
      */
-    @RequestMapping(value = "/push/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
+    @RequestMapping(value = "/{uid}/messages/{message_id}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
     @ResponseBody
     public  ResultUtil agencyToHaveDone(@PathVariable Long uid,@PathVariable String message_id){
         System.out.println("uid ---> "+uid);
@@ -76,7 +81,7 @@ public class MessageControler {
      * @description:
      * @return:
      */
-    @RequestMapping(value = "/push/{uid}/messages/forms/{businessKey}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
+    @RequestMapping(value = "/{uid}/messages/forms/{businessKey}/done",method = RequestMethod.GET,produces="application/json;charset=UTF-8")
     @ResponseBody
     public  ResultUtil agencyToHaveDoneByBusinessKey(@PathVariable Long uid,@PathVariable String businessKey){
         log.info("入参为：    uid = "+uid+"  businessKey = "+businessKey);
@@ -107,7 +112,7 @@ public class MessageControler {
    * @auther: JJY
    * @date: 2018/9/18
    */
-  @RequestMapping(value = "push/{uid}/sub",method = RequestMethod.GET)
+  @RequestMapping(value = "/{uid}/sub",method = RequestMethod.GET)
   @ResponseBody
   public ResultUtil newSubscription (@PathVariable Long uid){
 
@@ -122,7 +127,7 @@ public class MessageControler {
      * @auther: JJY
      * @date: 2018/9/18
      */
-    @RequestMapping(value = "push/{uid}/messages/{message_id}/read",method = RequestMethod.GET)
+    @RequestMapping(value = "/{uid}/messages/{message_id}/read",method = RequestMethod.GET)
     @ResponseBody
     public ResultUtil settingRead (@PathVariable Long uid,@PathVariable String message_id){
         log.info("传入参数uid:"+ uid + "信息id:"+ message_id);
@@ -137,7 +142,7 @@ public class MessageControler {
      * @auther: JJY
      * @date: 2018/9/18
      */
-    @RequestMapping(value = "push/{uid}/messages/all_read",method = RequestMethod.GET)
+    @RequestMapping(value = "/{uid}/messages/all_read",method = RequestMethod.GET)
     @ResponseBody
     public ResultUtil settingAllRead (@PathVariable Long uid, Long pageNum, Long pageSize){
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
@@ -152,12 +157,19 @@ public class MessageControler {
      * @auther: JJY
      * @date: 2018/9/18
      */
-    @RequestMapping(value = "push/{uid}/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/{uid}/list",method = RequestMethod.GET)
     @ResponseBody
     public ResultUtil settingAllRead (@PathVariable Long uid,String message, Long pageNum, Long pageSize){
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
         return settingService.settingList(uid,pageNum,pageSize);
     };
+
+    @RequestMapping(value = "test",method = RequestMethod.POST)
+    @ResponseBody
+    public String getLogs(@NonEmpty("自定义日志 啦啦") String aa){
+    return "测试日志注解";
+    }
+
 
 
 }
