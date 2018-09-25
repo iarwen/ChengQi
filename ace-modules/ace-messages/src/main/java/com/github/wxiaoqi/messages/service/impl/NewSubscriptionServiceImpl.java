@@ -65,6 +65,10 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
             e.printStackTrace();
             return ResultUtil.returnError("=============="+e);
         }
-        return ResultUtil.returnSuccessByObject(messages);
+        if (messages.equals("")){
+            return ResultUtil.returnSuccess(messages);
+        }else {
+            return ResultUtil.returnSuccessByObject(messages);
+        }
     }
 }
