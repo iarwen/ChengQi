@@ -15,7 +15,7 @@ spring:
       legacy:
         enabled: true
 server:
-  port: 8768
+  port: 10006
 
 eureka:
   instance:
@@ -74,15 +74,15 @@ auth:
 
 #redis-cache \u76F8\u5173
 redis:
-  pool:
-    maxActive: 300
-    maxIdle: 100
-    maxWait: 1000
-  host: ${REDIS_HOST:localhost}
-  port:  ${REDIS_PORT:6379}
-  password:
-  timeout: 2000
-  # \u670D\u52A1\u6216\u5E94\u7528\u540D
-  sysName: motor-draft
-  enable: true
-  database: 0
+    pool:
+         maxActive: 300
+         maxIdle: 100
+         maxWait: 1000
+    host: ${REDIS_HOST:localhost}
+    port:  ${REDIS_PORT:6379}
+    password:
+    timeout: 2000
+    # 服务或应用名
+    sysName: motor-draft
+    enable: true
+    database: 0
