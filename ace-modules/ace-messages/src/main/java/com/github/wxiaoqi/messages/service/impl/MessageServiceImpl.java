@@ -65,7 +65,7 @@ public class MessageServiceImpl implements MessageService {
             }
 
             String[] to = messages.getTo();
-            for (int i = 0;i < to.length -1;i++){
+            for (int i = 0;i < to.length;i++){
                 String type = to[i].split(":")[0];//获取当前用户的类型
                 String uid = to[i].split(":")[1];//获取当前用户的ID
                 if("user".equals(type)){

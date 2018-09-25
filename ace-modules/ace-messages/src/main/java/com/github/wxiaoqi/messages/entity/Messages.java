@@ -20,7 +20,7 @@ public class Messages {
     //主送，由push服务分解
     private String[] to;
     //发出人id，由客户端获取详情
-    private Long form;
+    private UserInfo from;
     //业务类型
     private BusinessType business;
     //点击消息时的连接
