@@ -1,5 +1,7 @@
 package com.github.wxiaoqi.messages.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.ToString;
@@ -72,6 +74,15 @@ public class ResultUtil implements Serializable {
         ResultUtil result = new ResultUtil();
         result.setStatus(200);
         result.setContent(object);
+        return result;
+    }
+
+    //成功返回
+    public static ResultUtil returnSuccessByContent(Object object) {
+        ResultUtil result = new ResultUtil();
+        JSONArray objects = JSON.parseArray(object.toString());
+        result.setStatus(200);
+        result.setContent(objects);
         return result;
     }
 }

@@ -1,12 +1,13 @@
 package com.tianma.draft.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 @Data
 @ToString
@@ -77,6 +78,14 @@ public class ResultUtil implements Serializable {
         JSONObject parse = (JSONObject)JSONObject.parse(object.toString());
         result.setStatus(200);
         result.setJsonObject(parse);
+        return result;
+    }
+    //成功返回
+    public static ResultUtil returnSuccessByContent(Object object) {
+        ResultUtil result = new ResultUtil();
+        JSONArray objects = JSON.parseArray(object.toString());
+        result.setStatus(200);
+        result.setContent(objects);
         return result;
     }
 

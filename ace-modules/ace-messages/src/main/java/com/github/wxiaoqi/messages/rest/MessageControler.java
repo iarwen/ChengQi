@@ -129,7 +129,7 @@ public class MessageControler {
      */
     @RequestMapping(value = "/{uid}/messages/{message_id}/read",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingRead (@PathVariable Long uid,@PathVariable String message_id){
+    public ResultUtil settingRead (@PathVariable Long uid,@PathVariable Long message_id){
         log.info("传入参数uid:"+ uid + "信息id:"+ message_id);
         return settingService.settingRead(uid,message_id);
     };
@@ -159,7 +159,7 @@ public class MessageControler {
      */
     @RequestMapping(value = "/{uid}/list",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingAllRead (@PathVariable Long uid,String message, Long pageNum, Long pageSize){
+    public ResultUtil settingAllRead (@PathVariable Long uid,Long message, Long pageNum, Long pageSize){
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
         return settingService.settingList(uid,pageNum,pageSize);
     };
