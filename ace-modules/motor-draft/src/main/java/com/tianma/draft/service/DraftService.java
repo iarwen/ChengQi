@@ -16,4 +16,6 @@ public interface DraftService  {
     ResultUtil deleteDraft(Long message_id, Long uid);
 
     ResultUtil listDraft(Long uid, Long pageNum, Long pageSize);
+
+    ResultUtil getDratft(Long message_id, Long uid);
 }
