@@ -38,10 +38,10 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
         }
         //启动新的线程
         new Thread(() -> {
-            Jedis jedis2 =  new RedisConfig().jedisTemplate(Thread.class);
             try {
                 String message = "";
                 Thread.sleep(60000);
+                Jedis jedis2 =  new RedisConfig().jedisTemplate(Thread.class);
                 jedis.publish("user:"+999999+":message:channel", message);
                log.info("==============添加uid=999999的模拟信息成功=========="+message);
                 jedis2.close();
