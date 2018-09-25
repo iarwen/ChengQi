@@ -1,18 +1,13 @@
 package com.github.wxiaoqi.messages.rest;
 
-import com.github.wxiaoqi.messages.customannotation.NonEmpty;
 import com.github.wxiaoqi.messages.entity.Messages;
-import com.github.wxiaoqi.messages.entity.TestNotNull;
 import com.github.wxiaoqi.messages.service.MessageService;
 import com.github.wxiaoqi.messages.service.NewSubscriptionService;
 import com.github.wxiaoqi.messages.service.SettingService;
 import com.github.wxiaoqi.messages.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -163,12 +158,6 @@ public class MessageControler {
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
         return settingService.settingList(uid,pageNum,pageSize);
     };
-
-    @RequestMapping(value = "test",method = RequestMethod.POST)
-    @ResponseBody
-    public String getLogs(@NonEmpty("自定义日志 啦啦") String aa){
-    return "测试日志注解";
-    }
 
 
 
