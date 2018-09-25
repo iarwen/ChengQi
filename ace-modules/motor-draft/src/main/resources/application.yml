@@ -9,32 +9,6 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     default-property-inclusion: non_null
-  datasource:
-    name: test
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/chengqi?useUnicode=true&characterEncoding=UTF8
-    username: root
-    password: root
-    # \u4F7F\u7528druid\u6570\u636E\u6E90
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
-    filters: stat
-    maxActive: 20
-    initialSize: 1
-    maxWait: 60000
-    minIdle: 1
-    timeBetweenEvictionRunsMillis: 60000
-    minEvictableIdleTimeMillis: 300000
-    validationQuery: select 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    poolPreparedStatements: true
-    maxOpenPreparedStatements: 20
-  rabbitmq:
-    host: ${RABBIT_MQ_HOST:localhost}
-    port:  ${RABBIT_MQ_PORT:5672}
-    username: guest
-    password: guest
   sleuth:
     enabled: true
     http:
@@ -55,12 +29,6 @@ eureka:
       #            defaultZone: http://localhost:8761/eureka/
       # docker \u90E8\u7F72\u5F00\u542F
       defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
-# \u5FC5\u987B\u914D\u7F6E
-feign:
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
 
 ribbon:
   eureka:
@@ -110,11 +78,11 @@ redis:
     maxActive: 300
     maxIdle: 100
     maxWait: 1000
-  host: ${REDIS_HOST:192.168.0.1}
+  host: ${REDIS_HOST:localhost}
   port:  ${REDIS_PORT:6379}
   password:
   timeout: 2000
   # \u670D\u52A1\u6216\u5E94\u7528\u540D
-  sysName: ace-messages
+  sysName: motor-draft
   enable: true
   database: 0
