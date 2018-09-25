@@ -60,12 +60,11 @@ public class NewSubscriptionServiceImpl implements NewSubscriptionService {
                     unsubscribe();
                 }
             }, "user:" + uid + ":todo:channel", "user:" + uid + ":message:channel","user:"+999999+":message:channel");
-
+            jedis.close();
         } catch (Exception e) {
             e.printStackTrace();
             return ResultUtil.returnError("=============="+e);
         }
-        jedis.close();
-        return ResultUtil.returnSuccess(messages);
+        return ResultUtil.returnSuccessByObject(messages);
     }
 }

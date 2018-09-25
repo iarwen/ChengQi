@@ -2,6 +2,7 @@ package com.github.wxiaoqi.messages.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.ToString;
@@ -29,6 +30,8 @@ public class ResultUtil implements Serializable {
 
     //异常
     private Exception error;
+
+    private JSONObject jsonObject;
 
 
     //错误返回
@@ -70,10 +73,11 @@ public class ResultUtil implements Serializable {
         return result;
     }
     //成功返回
-    public static ResultUtil returnSuccess(Object object) {
+    public static ResultUtil returnSuccessByObject(Object object) {
         ResultUtil result = new ResultUtil();
+        JSONObject parse = (JSONObject)JSONObject.parse(object.toString());
         result.setStatus(200);
-        result.setContent(object);
+        result.setJsonObject(parse);
         return result;
     }
 
