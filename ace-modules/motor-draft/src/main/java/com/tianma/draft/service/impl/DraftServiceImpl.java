@@ -1,6 +1,7 @@
 package com.tianma.draft.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.tianma.draft.config.RedisConfig;
 import com.tianma.draft.entity.Messages;
 import com.tianma.draft.service.DraftService;
@@ -97,6 +98,33 @@ public class DraftServiceImpl implements DraftService {
             e.printStackTrace();
             return ResultUtil.returnError("删除草稿箱信息异常", 500, e);
         }
+    }
+
+    /**
+     * 功能描述:提取草稿箱的某条信息
+     *
+     * @param: message_id uid
+     * @return:  resultUtil
+     * @auther: 梁健
+     * @date: 2018年9月25日09:04:14
+     */
+    @Override
+    public ResultUtil getDratft(Long message_id, Long uid) {
+        Object str = null;
+        try{
+            String redisKey = "user:" + uid + ":message:draft";
+            Set<String> strings = jedis.zrangeByScore(redisKey, message_id, message_id);
+            for (String strs : strings){
+                str = strs;
+            }
+            log.info("获取的草稿信息为： "+str);
+            return  ResultUtil.returnSuccess(str);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.info("获取某条草稿信息异常");
+            return ResultUtil.returnError("草稿箱提取异常",500);
+        }
+
     }
 
     /***

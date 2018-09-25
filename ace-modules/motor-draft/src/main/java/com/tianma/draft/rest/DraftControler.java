@@ -48,4 +48,20 @@ public class DraftControler {
         return draftService.deleteDraft(message_id,uid);
     };
 
+    /**
+     *
+     * 功能描述: 删除某条草稿箱信息
+     *
+     * @param:
+     * @return:
+     * @auther: JJY
+     * @date: 2018/9/24
+     */
+    @RequestMapping(value = "/users/{uid}/draft/{message_id}",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultUtil getDratft(@PathVariable Long message_id,@PathVariable Long uid){
+        return draftService.getDratft(message_id,uid);
+    };
+
+
 }
