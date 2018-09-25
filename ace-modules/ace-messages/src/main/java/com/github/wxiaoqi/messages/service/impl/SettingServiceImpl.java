@@ -150,7 +150,7 @@ public class SettingServiceImpl implements SettingService {
             log.info("=============查询历史信息开始===========");
             start = (page -1) * pageSize  ;
             stop = (page -1) * pageSize  + pageSize - 1 ;
-            Set<String> all = jedis.zrange("user:" + uid + ":"+type+":zset", start, stop);
+            Set<String> all = jedis.zrevrange("user:" + uid + ":"+type+":zset", start, stop);
             log.info("拉取列表城成功");
             jedis.close();
             return ResultUtil.returnSuccessByContent(all);
