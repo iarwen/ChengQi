@@ -146,9 +146,9 @@ public class SettingServiceImpl implements SettingService {
             jedis.close();
             return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
-            log.info("设置已读异常");
+            log.info("获取列表异常");
             e.printStackTrace();
-            return  ResultUtil.returnError("设置已读异常",500,e);
+            return  ResultUtil.returnError("获取列表异常",500,e);
         }
     }
 }
