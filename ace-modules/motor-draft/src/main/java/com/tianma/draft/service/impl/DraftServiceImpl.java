@@ -46,8 +46,8 @@ public class DraftServiceImpl implements DraftService {
             messages.setId(incrId);
             log.info("生成的消息ID为：" + messages.getId());
             log.info("消息发送的时间为：" + messages.getTime());
-            jedis.zadd("user:" + uid + ":message:draft", incrId, JSON.toJSONString(messages));
-            log.info("消息已存入草稿箱列表 : user:" + uid + ":message:draft");
+            jedis.zadd("user:" + uid + ":draft:zset", incrId, JSON.toJSONString(messages));
+            log.info("消息已存入草稿箱列表 : user:" + uid + ":draft:zset");
             jedis.close();
             log.info("关闭redis");
             return ResultUtil.returnSuccess();
@@ -76,17 +76,17 @@ public class DraftServiceImpl implements DraftService {
                 return ResultUtil.returnError("传入信息id或者uid为空");
             }
             log.info("开始删除信息");
-            Set<String> zrange = jedis.zrange("user:" + uid + ":message:draft", 0, -1);
+            Set<String> zrange = jedis.zrange("user:" + uid + ":draft:zset", 0, -1);
             log.info("Redis 待转的数据为 ： "+ zrange);
             Iterator<String> iterator = zrange.iterator();
             while (iterator.hasNext()){
                 Messages messages = JSON.parseObject(iterator.next(),Messages.class);
                 if(messages.getId() == message_id){
                     //获取score
-                    Double zscore = jedis.zscore("user:" + uid + ":message:draft", JSON.toJSONString(messages));
+                    Double zscore = jedis.zscore("user:" + uid + ":draft:zset", JSON.toJSONString(messages));
                     log.info("score:" + zscore);
                     log.info("删除草稿箱信息：" + JSON.toJSON(messages));
-                    jedis.zrem("user:" + uid + ":message:draft", JSON.toJSONString(messages));
+                    jedis.zrem("user:" + uid + ":draft:zset", JSON.toJSONString(messages));
                     jedis.close();
                     break;
                 }
@@ -107,19 +107,17 @@ public class DraftServiceImpl implements DraftService {
      * @date: 2018/9/24
      */
     @Override
-    public ResultUtil listDraft(Long uid, Long pageNum, Long pageSize) {
+    public ResultUtil listDraft(Long uid) {
         try {
             log.info("开始查询列表");
-            Long start;
-            Long stop;
-            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
-                log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
+            Long start = 0L;
+            Long stop = -1L;
+            if (ObjectUtils.isEmpty(uid) ) {
+                log.error("传入uid为空");
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============查询历史信息开始===========");
-            start = (pageNum -1) * pageSize  ;
-            stop = (pageNum -1) * pageSize  + pageSize - 1 ;
-            Set<String> all = jedis.zrange("user:" + uid + ":message:draft", start, stop);
+            Set<String> all = jedis.zrange("user:" + uid + ":draft:zset", start, stop);
             jedis.close();
             log.info("查询结束");
             return ResultUtil.returnSuccessByContent(all);

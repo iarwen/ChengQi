@@ -26,7 +26,7 @@ public class DraftControler {
      * 2018/09/24 15:45
      * @param messages uid
      */
-    @RequestMapping(value = "/users/{uid}/draft",method = RequestMethod.POST)
+    @RequestMapping(value = "/draft/user/{uid}",method = RequestMethod.POST)
     @ResponseBody
     public ResultUtil addDraft(@RequestBody Messages messages,
                                @PathVariable Long uid){
@@ -41,7 +41,7 @@ public class DraftControler {
      * @auther: JJY
      * @date: 2018/9/24
      */
-    @RequestMapping(value = "/users/{uid}/draft/{message_id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/draft/user/{uid}/message/{message_id}",method = RequestMethod.DELETE)
     @ResponseBody
     public ResultUtil deleteDraft(@PathVariable Long message_id,
                                @PathVariable Long uid){
@@ -56,27 +56,10 @@ public class DraftControler {
      * @auther: JJY
      * @date: 2018/9/24
      */
-    @RequestMapping(value = "/users/{uid}/draft/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/draft/user/{uid}/list",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil listDraft(@PathVariable Long uid, Long pageNum, Long pageSize){
-        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
-        return draftService.listDraft(uid,pageNum,pageSize);
+    public ResultUtil listDraft(@PathVariable Long uid){
+        log.info("传入参数uid:"+ uid);
+        return draftService.listDraft(uid);
     };
-
-    /**
-     *
-     * 功能描述: 删除某条草稿箱信息
-     *
-     * @param:
-     * @return:
-     * @auther: JJY
-     * @date: 2018/9/24
-     */
-    @RequestMapping(value = "/users/{uid}/draft/{message_id}",method = RequestMethod.GET)
-    @ResponseBody
-    public ResultUtil getDratft(@PathVariable Long message_id,@PathVariable Long uid){
-        return draftService.getDratft(message_id,uid);
-    };
-
-
 }
