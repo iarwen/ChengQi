@@ -282,8 +282,8 @@ public class MessageServiceImpl implements MessageService {
                     jedis.publish("user:"+hashMap.get("user")+":todo:channel",JSON.toJSONString(messages));
                     log.info("已放入待办 Channel : "+"user:"+hashMap.get("user")+":todo:channel");
                 }else {
-                    log.info("未知消息无法放入 Channel");
-                    return false;
+                    jedis.publish("user:"+hashMap.get("user")+":todo:channel",JSON.toJSONString(messages));
+                    log.info("已放入待办 Channel : "+"user:"+hashMap.get("user")+":todo:channel");
                 }
             }
             jedis.close();

@@ -30,7 +30,7 @@ public class Messages {
     //用户打开过此消息时置位真
     private boolean readed;
     //当前端收到removed为真的消息时要将此id代表的消息从信息流中删除
-    private boolean removed;
+    private boolean removed = true;
     //消息体
     private MessagesBody body;
 
