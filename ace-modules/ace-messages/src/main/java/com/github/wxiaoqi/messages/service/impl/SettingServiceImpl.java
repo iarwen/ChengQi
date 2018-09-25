@@ -34,7 +34,7 @@ public class SettingServiceImpl implements SettingService {
      * @date: 2018/9/18
      */
     @Override
-    public ResultUtil settingRead(Long uid, String message_id) {
+    public ResultUtil settingRead(Long uid, Long message_id) {
         try {
         if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(message_id)) {
             log.error("传入uid为空或者message_id为空");
@@ -46,7 +46,7 @@ public class SettingServiceImpl implements SettingService {
             Iterator<String> iterator = zrange.iterator();
             while (iterator.hasNext()){
                 Messages messages = JSON.parseObject(iterator.next(),Messages.class);
-                if(messages.getId().toString().equals(message_id)){
+                if(messages.getId() == message_id){
                         //获取score
                         Double zscore = jedis.zscore("user:" + uid + ":message:zset", JSON.toJSONString(messages));
                         log.info("score:" + zscore);
@@ -114,7 +114,7 @@ public class SettingServiceImpl implements SettingService {
             }
             Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             jedis.close();
-            return ResultUtil.returnSuccess(all);
+            return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
             log.info("设置已读异常");
             e.printStackTrace();
@@ -143,7 +143,7 @@ public class SettingServiceImpl implements SettingService {
             stop = (pageNum -1) * pageSize  + pageSize - 1 ;
             Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             jedis.close();
-            return ResultUtil.returnSuccess(all);
+            return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
             log.info("设置已读异常");
             e.printStackTrace();

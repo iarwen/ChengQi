@@ -1,7 +1,6 @@
 package com.tianma.draft.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.tianma.draft.config.RedisConfig;
 import com.tianma.draft.entity.Messages;
 import com.tianma.draft.service.DraftService;
@@ -123,7 +122,7 @@ public class DraftServiceImpl implements DraftService {
             Set<String> all = jedis.zrange("user:" + uid + ":message:draft", start, stop);
             jedis.close();
             log.info("查询结束");
-            return ResultUtil.returnSuccess(all);
+            return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
             log.info("获取列表异常");
             e.printStackTrace();
