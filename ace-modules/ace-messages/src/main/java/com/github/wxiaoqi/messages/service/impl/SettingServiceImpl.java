@@ -130,19 +130,19 @@ public class SettingServiceImpl implements SettingService {
      * @date: 2018/9/18
      */
     @Override
-    public ResultUtil settingList(Long uid, Long pageNum, Long pageSize) {
+    public ResultUtil settingList(Long uid, Long pageNum, Long pageSize,String type) {
         try {
             Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
             Long start;
             Long stop;
-            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
+            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize) || ObjectUtils.isEmpty(type)) {
                 log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============查询历史信息开始===========");
             start = (pageNum -1) * pageSize  ;
             stop = (pageNum -1) * pageSize  + pageSize - 1 ;
-            Set<String> all = jedis.zrange("user:" + uid + ":message:zset", start, stop);
+            Set<String> all = jedis.zrange("user:" + uid + ":"+type+":zset", start, stop);
             jedis.close();
             return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
