@@ -128,6 +128,7 @@ public class MessageServiceImpl implements MessageService {
                     jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
                     log.info("删除完毕，开始查询已办列表信息");
                     log.info("开始添加已办信息列表");
+                    messages.setRemoved(false);  // 转为已办消息
                     jedis.zadd("user:"+hashMap.get("uid")+":done:zset",messages.getId(),JSON.toJSONString(messages));
                     log.info("转已办完毕,将消息存入 channel");
                     hashMap.put("user",hashMap.get(uid));
@@ -192,6 +193,7 @@ public class MessageServiceImpl implements MessageService {
                     jedis.zrem("user:" + uid + ":todo:zset",JSON.toJSONString(messages));
 
                     log.info("开始添加已办信息列表");
+                    messages.setRemoved(false); // 转为已办消息
                     jedis.zadd("user:"+hashMap.get("uid")+":done:zset",messages.getId(),JSON.toJSONString(messages));
                     log.info("已办信息列表添加完成");
 
@@ -233,15 +235,16 @@ public class MessageServiceImpl implements MessageService {
                 jedis.zadd("user:"+hashMap.get("user")+":message:zset",messages.getId(),JSON.toJSONString(messages));
                 log.info("消息已存入通知消息列表 : user:"+hashMap.get("user")+":message:zset");
             }else if("business".equals(messages.getType())){
-                //判断数据是否是已办数据
-                if(messages.isRemoved() == false){
-                    log.info("已办消息,不可存入待办消息记录列表。");
-                    return false;
-                }else {
-                    //代办消息列表
-                    jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
-                    log.info("消息已存入代办消息列表 : user:"+hashMap.get("user")+":todo:zset");
-                }
+                jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+//                //判断数据是否是已办数据
+//                if(messages.isRemoved() == false){
+//                    log.info("已办消息,不可存入待办消息记录列表。");
+//                    return false;
+//                }else {
+//                    //代办消息列表
+//                    jedis.zadd("user:"+hashMap.get("user")+":todo:zset",messages.getId(),JSON.toJSONString(messages));
+//                    log.info("消息已存入代办消息列表 : user:"+hashMap.get("user")+":todo:zset");
+//                }
             }else{
                 log.info("未知的消息类型: "+messages.getType());
                 return false;

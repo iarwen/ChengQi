@@ -9,18 +9,13 @@ spring:
         date-format: yyyy-MM-dd HH:mm:ss
         time-zone: GMT+8
         default-property-inclusion: non_null
-    rabbitmq:
-        host: ${RABBIT_MQ_HOST:localhost}
-        port:  ${RABBIT_MQ_PORT:5672}
-        username: guest
-        password: guest
     sleuth:
       enabled: true
       http:
         legacy:
           enabled: true
 server:
-    port: 8767
+    port: 10004
 
 eureka:
     instance:
