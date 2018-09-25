@@ -145,7 +145,7 @@ public class MessageControler {
     };
     /**
      *
-     * 功能描述: 全部置已读
+     * 功能描述: 列表
      *
      * @param:
      * @return:
@@ -154,7 +154,7 @@ public class MessageControler {
      */
     @RequestMapping(value = "/{uid}/list",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingAllRead (@PathVariable Long uid,Long message, Long pageNum, Long pageSize){
+    public ResultUtil settingAllRead (@PathVariable Long uid,String message, Long pageNum, Long pageSize){
         log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
         return settingService.settingList(uid,pageNum,pageSize);
     };
