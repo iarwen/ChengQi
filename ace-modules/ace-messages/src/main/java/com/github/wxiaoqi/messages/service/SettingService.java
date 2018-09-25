@@ -13,7 +13,7 @@ public interface SettingService {
 
     ResultUtil settingRead(Long uid, Long message_id);
 
-    ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize);
+    ResultUtil settingAllRead(Long uid, Long page, Long pageSize);
 
-    ResultUtil settingList(Long uid, Long pageNum, Long pageSize,String type);
+    ResultUtil settingList(Long uid, Long page, Long pageSize,String type);
 }
