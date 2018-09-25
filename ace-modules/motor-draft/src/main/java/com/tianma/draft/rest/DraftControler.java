@@ -47,6 +47,21 @@ public class DraftControler {
                                @PathVariable Long uid){
         return draftService.deleteDraft(message_id,uid);
     };
+    /**
+     *
+     * 功能描述: 获取草稿箱列表
+     *
+     * @param:
+     * @return:
+     * @auther: JJY
+     * @date: 2018/9/24
+     */
+    @RequestMapping(value = "/users/{uid}/draft/list",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultUtil listDraft(@PathVariable Long uid, Long pageNum, Long pageSize){
+        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
+        return draftService.listDraft(uid,pageNum,pageSize);
+    };
 
     /**
      *
