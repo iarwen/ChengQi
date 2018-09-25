@@ -112,17 +112,26 @@ public class DraftServiceImpl implements DraftService {
     public ResultUtil getDratft(Long message_id, Long uid) {
         Object str = null;
         try{
+            log.info("开始提取草稿箱信息");
+            log.info("开始检查参数");
+            if(ObjectUtils.isEmpty(message_id) || ObjectUtils.isEmpty(uid)
+                    || Objects.isNull(message_id) || Objects.isNull(uid)){
+             return ResultUtil.returnError("参数异常，请检查参数",500);
+            }
+
             String redisKey = "user:" + uid + ":message:draft";
+            log.info("当前操作的 key 为 ： "+redisKey);
             Set<String> strings = jedis.zrangeByScore(redisKey, message_id, message_id);
             for (String strs : strings){
                 str = strs;
             }
             log.info("获取的草稿信息为： "+str);
+            log.info("草稿箱信息提取完成");
             return  ResultUtil.returnSuccess(str);
         }catch (Exception e){
             e.printStackTrace();
             log.info("获取某条草稿信息异常");
-            return ResultUtil.returnError("草稿箱提取异常",500);
+            return ResultUtil.returnError("草稿箱提取异常",500,e);
         }
 
     }
