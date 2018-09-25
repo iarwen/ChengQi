@@ -139,9 +139,9 @@ public class MessageControler {
      */
     @RequestMapping(value = "/{uid}/messages/all_read",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingAllRead (@PathVariable Long uid, Long pageNum, Long pageSize){
-        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
-        return settingService.settingAllRead(uid,pageNum,pageSize);
+    public ResultUtil settingAllRead (@PathVariable Long uid, Long page, Long pageSize){
+        log.info("传入参数uid:"+ uid + "页数:"+ page +"条数:"+ pageSize);
+        return settingService.settingAllRead(uid,page,pageSize);
     };
     /**
      *
@@ -154,9 +154,9 @@ public class MessageControler {
      */
     @RequestMapping(value = "/{uid}/list",method = RequestMethod.GET)
     @ResponseBody
-    public ResultUtil settingList (@PathVariable Long uid,String type, Long pageNum, Long pageSize){
-        log.info("传入参数uid:"+ uid + "页数:"+ pageNum +"条数:"+ pageSize);
-        return settingService.settingList(uid,pageNum,pageSize,type);
+    public ResultUtil settingList (@PathVariable Long uid,String type, Long page, Long pageSize){
+        log.info("传入参数uid:"+ uid + "页数:"+ page +"条数:"+ pageSize);
+        return settingService.settingList(uid,page,pageSize,type);
     };
 
 

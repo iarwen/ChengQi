@@ -76,19 +76,23 @@ public class SettingServiceImpl implements SettingService {
      * @date: 2018/9/18
      */
     @Override
-    public ResultUtil settingAllRead(Long uid, Long pageNum, Long pageSize) {
+    public ResultUtil settingAllRead(Long uid, Long page, Long pageSize) {
 
         try {
             Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
             Long start;
             Long stop;
-            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
-                log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
-                ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
+            if (ObjectUtils.isEmpty(page) || ObjectUtils.isEmpty(pageSize)){
+                start = 1L;
+                stop = 10L;
+            }
+            if (ObjectUtils.isEmpty(uid)) {
+                log.error("传入uid为空");
+                ResultUtil.returnError("传入uid为空", 500);
             }
             log.info("=============设置全部已读开始===========");
-            start = (pageNum -1) * pageSize  ;
-            stop = (pageNum -1) * pageSize  + pageSize - 1;
+            start = (page -1) * pageSize  ;
+            stop = (page -1) * pageSize  + pageSize - 1;
             Set<String> zrange = jedis.zrange("user:" + uid + ":message:zset", start, stop);
             log.info("Redis 待转的数据为 ： "+ zrange);
             //迭代器
@@ -130,18 +134,22 @@ public class SettingServiceImpl implements SettingService {
      * @date: 2018/9/18
      */
     @Override
-    public ResultUtil settingList(Long uid, Long pageNum, Long pageSize,String type) {
+    public ResultUtil settingList(Long uid, Long page, Long pageSize,String type) {
         try {
             Jedis jedis =  new RedisConfig().jedisTemplate(NewSubscriptionServiceImpl.class);
             Long start;
             Long stop;
-            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize) || ObjectUtils.isEmpty(type)) {
-                log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
-                ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
+            if (ObjectUtils.isEmpty(page) || ObjectUtils.isEmpty(pageSize)){
+                start = 1L;
+                stop = 10L;
+            }
+            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(type)) {
+                log.error("传入uid为空");
+                ResultUtil.returnError("传入uid为空", 500);
             }
             log.info("=============查询历史信息开始===========");
-            start = (pageNum -1) * pageSize  ;
-            stop = (pageNum -1) * pageSize  + pageSize - 1 ;
+            start = (page -1) * pageSize  ;
+            stop = (page -1) * pageSize  + pageSize - 1 ;
             Set<String> all = jedis.zrange("user:" + uid + ":"+type+":zset", start, stop);
             log.info("拉取列表城成功");
             jedis.close();
