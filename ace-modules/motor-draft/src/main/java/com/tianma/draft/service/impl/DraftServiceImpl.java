@@ -98,6 +98,37 @@ public class DraftServiceImpl implements DraftService {
             return ResultUtil.returnError("删除草稿箱信息异常", 500, e);
         }
     }
+    /**
+     * 功能描述:获取草稿箱列表
+     *
+     * @param: uid
+     * @return:  resultUtil
+     * @auther: JJY
+     * @date: 2018/9/24
+     */
+    @Override
+    public ResultUtil listDraft(Long uid, Long pageNum, Long pageSize) {
+        try {
+            log.info("开始查询列表");
+            Long start;
+            Long stop;
+            if (ObjectUtils.isEmpty(uid) || ObjectUtils.isEmpty(pageNum)||ObjectUtils.isEmpty(pageSize)) {
+                log.error("传入uid为空或者pageNum为空或者出入pageSize为空");
+                ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
+            }
+            log.info("=============查询历史信息开始===========");
+            start = (pageNum -1) * pageSize  ;
+            stop = (pageNum -1) * pageSize  + pageSize - 1 ;
+            Set<String> all = jedis.zrange("user:" + uid + ":message:draft", start, stop);
+            jedis.close();
+            log.info("查询结束");
+            return ResultUtil.returnSuccess(all);
+        } catch (Exception e) {
+            log.info("获取列表异常");
+            e.printStackTrace();
+            return  ResultUtil.returnError("获取列表异常异常",500,e);
+        }
+    }
 
     /***
      *  getIncrId
