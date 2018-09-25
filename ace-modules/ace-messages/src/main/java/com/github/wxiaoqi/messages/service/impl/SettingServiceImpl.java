@@ -143,6 +143,7 @@ public class SettingServiceImpl implements SettingService {
             start = (pageNum -1) * pageSize  ;
             stop = (pageNum -1) * pageSize  + pageSize - 1 ;
             Set<String> all = jedis.zrange("user:" + uid + ":"+type+":zset", start, stop);
+            log.info("拉取列表城成功");
             jedis.close();
             return ResultUtil.returnSuccessByContent(all);
         } catch (Exception e) {
