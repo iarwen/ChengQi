@@ -62,4 +62,20 @@ public class DraftControler {
         log.info("传入参数uid:"+ uid);
         return draftService.listDraft(uid);
     };
+    /**
+     *
+     * 功能描述: 提取草稿箱的某条信息
+     *
+     * @param:
+     * @return:
+     * @auther: 梁健
+     * @date: 2018/9/24
+     */
+    @RequestMapping(value = "/user/{uid}/draft/message/{message_id}",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultUtil getDratft(@PathVariable Long message_id,@PathVariable Long uid){
+        return draftService.getDratft(message_id,uid);
+    };
+
+
 }

@@ -146,8 +146,8 @@ public class DraftServiceImpl implements DraftService {
                     || Objects.isNull(message_id) || Objects.isNull(uid)){
              return ResultUtil.returnError("参数异常，请检查参数",500);
             }
-
-            String redisKey = "user:" + uid + ":message:draft";
+            log.info("传入的参数为：message_id="+message_id+"      uid="+uid);
+            String redisKey = "user:" + uid + ":draft:zset";
             log.info("当前操作的 key 为 ： "+redisKey);
             Set<String> strings = jedis.zrangeByScore(redisKey, message_id, message_id);
             for (String strs : strings){
