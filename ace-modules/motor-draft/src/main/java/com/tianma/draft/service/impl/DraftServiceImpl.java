@@ -117,7 +117,7 @@ public class DraftServiceImpl implements DraftService {
                 ResultUtil.returnError("传入uid为空或者pageNum为空或者出入pageSize为空", 500);
             }
             log.info("=============查询历史信息开始===========");
-            Set<String> all = jedis.zrange("user:" + uid + ":draft:zset", start, stop);
+            Set<String> all = jedis.zrevrange("user:" + uid + ":draft:zset", start, stop);
             jedis.close();
             log.info("查询结束");
             return ResultUtil.returnSuccessByContent(all);
